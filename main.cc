@@ -51,9 +51,11 @@ load_palette(char const* path)
 int
 main([[maybe_unused]] int argc, char** argv)
 {
-    std::fprintf(stderr, "Usage: ./main <palette_path> <input_path.png> <output_path.png>\n");
+    std::fprintf(stderr, "Usage: ./main <palette_path> <input_path.png> <output_path.png> <blend 0.0-1.0>\n");
     std::fprintf(stderr, "Palette format: rgb in hex in each line\n");
     std::fprintf(stderr, "Hope you entered it right 'couse i sure ain't checking it\n");
+
+    double blend = std::stod(argv[4]);
 
     auto palette = load_palette(argv[1]);
     std::printf("Loaded %zu colors from palette\n", palette.size());
@@ -62,7 +64,7 @@ main([[maybe_unused]] int argc, char** argv)
     gil::read_image(argv[2], image, gil::png_tag{});
 
     auto view = gil::view(image);
-    std::for_each(std::execution::par_unseq, view.begin(), view.end(), [&palette](auto& pixel){
+    std::for_each(std::execution::par_unseq, view.begin(), view.end(), [&palette, blend](auto& pixel){
         ::pixel_t closest = palette[0];
         std::int32_t min_offset = std::numeric_limits<std::int32_t>::max();
         for(::pixel_t color : palette) {
@@ -75,7 +77,18 @@ main([[maybe_unused]] int argc, char** argv)
                 closest = color;
             }
         }
-        pixel = closest;
+
+        if(blend == 1) {
+            pixel = closest;
+        } else {
+            double diff_r = static_cast<std::int32_t>(pixel[0]) - static_cast<std::int32_t>(closest[0]);
+            double diff_g = static_cast<std::int32_t>(pixel[1]) - static_cast<std::int32_t>(closest[1]);
+            double diff_b = static_cast<std::int32_t>(pixel[2]) - static_cast<std::int32_t>(closest[2]);
+
+            pixel[0] = static_cast<double>(pixel[0]) - (diff_r * blend);
+            pixel[1] = static_cast<double>(pixel[1]) - (diff_g * blend);
+            pixel[2] = static_cast<double>(pixel[2]) - (diff_b * blend);
+        }
     });
 
     gil::write_view(argv[3], view, gil::png_tag{});
