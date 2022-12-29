@@ -15,3 +15,5 @@ image_match_palette: $(OBJ)
 
 clean:
 	rm -f $(OBJ) image_match_palette
+
+.PHONY: all clean
