@@ -12,10 +12,10 @@ project(image_palette)
 
 find_package(Threads)
 
-add_executable(main main.cc)
+add_executable(image_match_palette main.cc)
 
 target_link_libraries(
-    main PRIVATE
+    image_match_palette PRIVATE
     Threads::Threads # for parallelism
     png # libpng
 )
