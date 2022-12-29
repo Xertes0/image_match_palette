@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O3
+CXXFLAGS = -std=c++17 -O3
 LDFLAGS = -lpng
 
 SRC = main.cc
