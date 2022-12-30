@@ -27,12 +27,8 @@ load_palette(std::filesystem::path const& path)
 {
     std::ifstream palette_file{path, std::ios_base::in};
 
-    palette_file.seekg(0, std::ios_base::end);
-    auto line_count = palette_file.tellg();
-    palette_file.seekg(0, std::ios_base::beg);
-
     std::vector<pixel_t> palette{};
-    palette.reserve(line_count);
+    palette.reserve(32);
 
     while(!palette_file.fail()) {
         std::uint32_t hex{};
